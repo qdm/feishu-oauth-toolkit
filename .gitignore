@@ -1,0 +1,38 @@
+# Secrets — NEVER commit
+.env
+*.env
+.env.local
+
+# Persisted user tokens (contains access_token + refresh_token)
+feishu-user-tokens.json
+tokens.json
+*-tokens.json
+
+# Callback landing files
+code.txt
+*.callback.json
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+ENV/
+
+# Editor / OS
+.idea/
+.vscode/
+.DS_Store
+*.swp
+*.swo
+
+# Logs
+*.log

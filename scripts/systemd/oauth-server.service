@@ -1,0 +1,16 @@
+[Unit]
+Description=Feishu OAuth callback server (Python http.server, 127.0.0.1:18080)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+Environment=PATH=/home/agentuser/.local/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/usr/bin/python3 /home/agentuser/feishu-oauth-toolkit-build/src/feishu_oauth/server.py
+Restart=always
+RestartSec=3
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

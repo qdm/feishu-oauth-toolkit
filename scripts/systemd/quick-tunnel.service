@@ -1,0 +1,19 @@
+[Unit]
+Description=Cloudflare Quick Tunnel to localhost:18080 (Feishu OAuth callback)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# Adjust the PATH for your user; systemd --user does not always inherit shell env.
+Environment=PATH=/home/agentuser/.local/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/home/agentuser/.local/bin/cloudflared tunnel --no-autoupdate --url http://localhost:18080
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+KillMode=mixed
+TimeoutStopSec=15
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "feishu-oauth-toolkit"
+version = "0.1.0"
+description = "Headless Feishu OAuth 2.0 toolkit: callback server + cloudflared tunnel + verification"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "qdm" }]
+keywords = ["feishu", "lark", "oauth", "cloudflared", "headless"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: POSIX :: Linux",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=7", "ruff>=0.4"]
+
+[project.scripts]
+feishu-auth-url = "feishu_oauth.auth:cli_build_url"
+feishu-verify    = "feishu_oauth.verify:cli_main"
+feishu-server    = "feishu_oauth.server:cli_main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
