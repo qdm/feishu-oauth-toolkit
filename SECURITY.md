@@ -32,7 +32,7 @@ That path is also git-ignored.
 ## What ships in this repo
 
 ```
-16 files / 100 KB / 451 LoC of Python
+17 files / 104 KB / 451 LoC of Python
 ```
 
 A `grep -r "FEISHU_APP_SECRET" .` against the source tree should return
