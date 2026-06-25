@@ -23,7 +23,7 @@ code{background:#f5f5f5;padding:2px 6px;border-radius:3px;font-size:13px;word-br
 <div class="box">
 <h1>✅ 授权 code 已收到</h1>
 <p>你可以关闭这个页面,回到终端继续验证。</p>
-<p style="font-size:13px;color:#666">code 已保存到: <code>{code_file}</code></p>
+<p style="font-size:13px;color:#666">code 已保存到: <code>__CODE_FILE__</code></p>
 </div>
 </body></html>
 """
@@ -37,10 +37,19 @@ h1{margin-top:0;font-size:20px}
 <body>
 <div class="box">
 <h1>❌ 授权失败</h1>
-<p>{msg}</p>
+<p>__MSG__</p>
 </div>
 </body></html>
 """
+
+
+def _html_escape(s: str) -> str:
+    """HTML escape (避免 msg 里带 < > & 破坏页面)."""
+    return (
+        s.replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+    )
 
 
 class Handler(http.server.BaseHTTPRequestHandler):
@@ -75,7 +84,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
         if error or not code:
             msg = f"error={error}, description={error_desc}" if error else "callback 缺少 code 参数"
             print(f"[ERROR] {msg}", flush=True)
-            self._html(400, HTML_ERROR_TPL.format(msg=msg))
+            # 用 str.replace 占位符,避开 HTML_ERROR_TPL 里的 CSS {font-family...} 被 .format() 当占位符
+            body = HTML_ERROR_TPL.replace("__MSG__", _html_escape(msg))
+            self._html(400, body)
             return
 
         self.code_file.write_text(
@@ -88,7 +99,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
         self.code_file.chmod(0o600)
         print(f"[OK] code 已收到,长度 {len(code)},已写入 {self.code_file}", flush=True)
 
-        self._html(200, HTML_SUCCESS.format(code_file=self.code_file))
+        # 用 str.replace 占位符,避开 HTML_SUCCESS 里 CSS {font-family...} 被 .format() 当占位符
+        body = HTML_SUCCESS.replace("__CODE_FILE__", _html_escape(str(self.code_file)))
+        self._html(200, body)
 
     def _html(self, status: int, body: str) -> None:
         self.send_response(status)

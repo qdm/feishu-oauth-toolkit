@@ -8,7 +8,12 @@ from pathlib import Path
 
 
 def _load_dotenv(path: Path) -> None:
-    """Tiny .env loader — no external dependency, no override of existing env."""
+    """Tiny .env loader — if .env exists, .env wins over inherited env vars.
+
+    强制覆盖(而非 setdefault):在 OAuth 这种 secret-敏感场景, .env 应该是 single source of truth.
+    否则从父进程继承的 FEISHU_APP_ID 会悄悄覆盖掉 .env 里的值(像我们之前踩的:
+    .env 写自己的 app_id, process env 有 OpenClaw 默认的另一个, 拿到的是错的).
+    """
     if not path.exists():
         return
     for line in path.read_text().splitlines():
@@ -18,11 +23,37 @@ def _load_dotenv(path: Path) -> None:
         k, v = line.split("=", 1)
         k = k.strip()
         v = v.strip().strip('"').strip("'")
-        os.environ.setdefault(k, v)
+        os.environ[k] = v  # 强制 .env 覆盖
 
 
-# Load .env from the current working directory if present
-_load_dotenv(Path.cwd() / ".env")
+# Load .env from (in order):
+#   1. current working directory (developer override)
+#   2. the package's install location (production / systemd)
+# First one that exists wins.
+def _find_dotenv() -> Path | None:
+    """Find the .env file in (in order):
+      1. current working directory (developer override)
+      2. the project root (relative to this package, two levels up:
+         src/feishu_oauth/config.py -> src/feishu_oauth/ -> src/ -> repo root)
+      3. the parent of this package (legacy pip install layout)
+
+    First one that exists wins.
+    """
+    candidates: list[Path] = [Path.cwd() / ".env"]
+    pkg_dir = Path(__file__).resolve().parent  # src/feishu_oauth
+    # repo root (when installed editable from src/)
+    candidates.append(pkg_dir.parent.parent / ".env")
+    # one level up (legacy install layout)
+    candidates.append(pkg_dir.parent / ".env")
+    for p in candidates:
+        if p.exists():
+            return p
+    return None
+
+
+dotenv_path = _find_dotenv()
+if dotenv_path is not None:
+    _load_dotenv(dotenv_path)
 
 
 @dataclass(frozen=True)

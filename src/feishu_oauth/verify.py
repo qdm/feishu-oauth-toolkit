@@ -9,8 +9,8 @@ import urllib.parse
 import urllib.request
 from typing import Any
 
-from .auth import DEFAULT_SCOPES, exchange_code, http_post, refresh, save_token
-from .config import load_config
+from feishu_oauth.auth import exchange_code, refresh, save_token
+from feishu_oauth.config import load_config
 
 
 def http_get(url: str, headers: dict[str, str] | None = None, timeout: float = 15.0) -> dict[str, Any]:

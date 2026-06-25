@@ -104,9 +104,11 @@ async def _on_message(channel: FeishuChannel, inbound) -> None:
             opts={"reply_to": message_id} if message_id else None,
         )
         if not result.success:
+            err = result.error
+            # lark-oapi 1.6 的 SendError 用 hint / raw_code / code / retryable,没有 msg 属性
             sys.stderr.write(
-                f"[bot] send failed: code={result.error.code if result.error else '?'} "
-                f"msg={result.error.msg if result.error else '?'}\n"
+                f"[bot] send failed: code={err.raw_code if err else '?'} "
+                f"hint={err.hint if err else '?'}\n"
             )
     except Exception as exc:  # pragma: no cover — 保护 handler,不让 SDK 整个崩
         sys.stderr.write(f"[bot] _on_message exception: {exc!r}\n")

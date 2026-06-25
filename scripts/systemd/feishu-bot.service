@@ -1,0 +1,19 @@
+[Unit]
+Description=Feishu OAuth bot (lark-oapi FeishuChannel, WS long-connection, responds to "auth" with OAuth card)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# 必须包含 ~/.feishu-bot-venv (lark-oapi 装在里头) + ~/.local/bin
+Environment=PATH=/home/agentuser/.feishu-bot-venv/bin:/home/agentuser/.local/bin:/usr/local/bin:/usr/bin:/bin
+# 从项目目录启动,这样 load_config() 读 cwd 下的 .env (而不是 ~/.hermes/.env)
+WorkingDirectory=/home/agentuser/feishu-oauth-toolkit-build
+ExecStart=/home/agentuser/.feishu-bot-venv/bin/python -m feishu_oauth.bot
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

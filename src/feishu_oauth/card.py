@@ -13,8 +13,11 @@ TAG_PLEASE_BROWSER = "请在浏览器中完成"
 TAG_DONE_BRIEF = "授权完成"
 
 
-def _card_skeleton(header_title: str, header_tag: str) -> dict[str, Any]:
-    """返回一张空卡片的骨架(header + 空 elements + 空 actions)。"""
+def _card_skeleton(header_title: str) -> dict[str, Any]:
+    """返回一张空卡片的骨架(header + 空 elements)。
+
+    飞书卡片 schema 2.0 中 header 只认 title 和 template 两个字段,不认 tag。
+    """
     return {
         "schema": "2.0",
         "header": {
@@ -22,14 +25,11 @@ def _card_skeleton(header_title: str, header_tag: str) -> dict[str, Any]:
                 "tag": "plain_text",
                 "content": header_title,
             },
-            "tag": header_tag,  # 卡片右上角的浅灰文字
             "template": "blue",
         },
         "body": {
             "elements": [],
         },
-        # 顶层 actions 字段(部分飞书版本支持),也兼容放在 body.elements 里的 actions 块
-        "actions": [],
     }
 
 
@@ -45,7 +45,16 @@ def auth_request_card(auth_url: str) -> dict[str, Any]:
             f"auth_url 必须是绝对 https URL,收到:{auth_url[:60]!r}..."
         )
 
-    card = _card_skeleton("🔐 飞书 OAuth 授权", TAG_PLEASE_BROWSER)
+    card = _card_skeleton("🔐 飞书 OAuth 授权")
+    button = {
+        "tag": "button",
+        "text": {
+            "tag": "plain_text",
+            "content": "👉 同意并授权",
+        },
+        "type": "primary",
+        "url": auth_url,
+    }
     card["body"]["elements"] = [
         {
             "tag": "div",
@@ -53,36 +62,15 @@ def auth_request_card(auth_url: str) -> dict[str, Any]:
                 "tag": "lark_md",
                 "content": (
                     "机器人需要读取你的云空间(文档 / Wiki / 文件元信息),"
-                    "请在浏览器中点同意完成授权。"
-                    "\n\n授权完成后,机器人将获得你的 **user_access_token**,"
+                    "请在浏览器中点同意完成授权。\n\n"
+                    "授权完成后,机器人将获得你的 **user_access_token**,"
                     "可用于调用飞书 OpenAPI。"
                 ),
             },
         },
-        {
-            "tag": "hr",
-        },
+        {"tag": "hr"},
+        button,
     ]
-    # actions 既放顶层,也放 body.elements 末尾(飞书客户端两边都识别)
-    button_block = {
-        "tag": "button",
-        "text": {
-            "tag": "plain_text",
-            "content": "👉 同意并授权",
-        },
-        "type": "primary",
-        "behaviors": [
-            {
-                "type": "open_url",
-                "default_url": auth_url,
-                "url_target": auth_url,
-            }
-        ],
-    }
-    card["body"]["elements"].append(
-        {"tag": "action", "actions": [button_block]}
-    )
-    card["actions"] = [button_block]
     return card
 
 
@@ -106,7 +94,7 @@ def auth_done_card(
     else:
         rt_line = f"**refresh_token** 还有 **{refresh_token_days_left}** 天过期。"
 
-    card = _card_skeleton("✅ 授权完成", TAG_DONE_BRIEF)
+    card = _card_skeleton("✅ 授权完成")
     card["header"]["template"] = "green"
     card["body"]["elements"] = [
         {
