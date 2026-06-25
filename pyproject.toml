@@ -21,7 +21,9 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Operating System :: POSIX :: Linux",
 ]
-dependencies = []
+dependencies = [
+    "lark-oapi>=1.2",
+]
 
 [project.optional-dependencies]
 dev = ["pytest>=7", "ruff>=0.4"]
@@ -30,6 +32,7 @@ dev = ["pytest>=7", "ruff>=0.4"]
 feishu-auth-url = "feishu_oauth.auth:cli_build_url"
 feishu-verify    = "feishu_oauth.verify:cli_main"
 feishu-server    = "feishu_oauth.server:cli_main"
+feishu-bot       = "feishu_oauth.bot:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
