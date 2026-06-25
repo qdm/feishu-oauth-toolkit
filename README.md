@@ -8,9 +8,10 @@ End-to-end CLI toolkit for running the **飞书 (Feishu/Lark) OAuth 2.0 Authoriz
 - Verification scripts that exchange `code → user_access_token`, then probe each requested scope against the Feishu Open API
 - Token refresh (`offline_access`) round-trip verification
 
-Tested end-to-end against a 自建应用 with the nine read scopes listed in
-[docs/feishu-backend-setup.md](docs/feishu-backend-setup.md). No credentials
-ship in this repo — see [SECURITY.md](SECURITY.md) for the security model.
+Tested end-to-end against a custom app (自建应用) with the nine read scopes
+listed in [docs/feishu-backend-setup.md](docs/feishu-backend-setup.md). No
+credentials ship in this repo — see [SECURITY.md](SECURITY.md) for the
+security model.
 
 ---
 
@@ -115,8 +116,8 @@ See [SECURITY.md](SECURITY.md) for the full secret-handling model.
 | `offline_access`               | `POST /authen/v2/oauth/token` (refresh)    | ✅     |
 
 See [docs/feishu-backend-setup.md](docs/feishu-backend-setup.md) for the exact
-backend steps required before you can use these scopes — and for the **主页 URL
-陷阱** that blocks most first-time setups.
+backend steps required before you can use these scopes, and for the most
+common first-time-setup failure (an empty Web App home URL, 主页 URL).
 
 ## License
 
